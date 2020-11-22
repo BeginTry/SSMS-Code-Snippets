@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Change Physical File Names</Title>
+                        <Shortcut></Shortcut>
+			<Description>Query that generates ALTER DATABASE MODIFY FILE commands.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+		</Header>
+		<Snippet>
+			<Code Language="SQL">
+				<![CDATA[SELECT DB_NAME(database_id), 
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET OFFLINE;' Offline_cmd,
+	f.physical_name AS OldName,
+	'ALTER DATABASE [' + DB_NAME(database_id) + ']
+MODIFY FILE (NAME = ''' + f.name + ''', FILENAME = ''' + f.physical_name + ''');' AS Modify_File_cmd,
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET ONLINE;' Online_cmd
+FROM master.sys.master_files f
+ORDER BY DB_NAME(database_id)
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
