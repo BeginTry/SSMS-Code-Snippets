@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Find Object By Name</Title>
+                        <Shortcut></Shortcut>
+			<Description>Generates a script that searches for a SQL Server object by name across all databases (stored proc, view, function, etc.)</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>ObjectName</ID>
+                    <ToolTip>Name of the object (stored proc, view, function, etc.)</ToolTip>
+                    <Default>ObjectName</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[DECLARE @Tsql NVARCHAR(MAX) = '';
+
+SELECT @Tsql = @Tsql + 'SELECT ''' + d.name + ''' AS DBName, 
+	o.name COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectName, 
+  o.type_desc COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectType
+FROM [' + d.name + '].sys.objects o 
+WHERE o.name COLLATE SQL_Latin1_General_CP1_CI_AS = ''$ObjectName$''  UNION ALL ' + CHAR(13) + CHAR(10)
+FROM master.sys.databases d
+ORDER BY d.name
+
+SELECT @Tsql = LEFT (@Tsql, LEN(@Tsql) - LEN('UNION ALL ' + CHAR(13) + CHAR(10)))
+EXEC(@Tsql);
+GO]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

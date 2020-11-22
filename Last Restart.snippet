@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Last Restart-Copy</Title>
+                        <Shortcut></Shortcut>
+			<Description>Returns the date and time SQL was last started.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+		</Header>
+		<Snippet>
+			<Code Language="SQL">
+				<![CDATA[DECLARE @ProdVer VARCHAR(128);
+DECLARE @MajorVer SMALLINT;
+DECLARE @Tsql NVARCHAR(MAX);
+DECLARE @Restart DATETIME;
+
+SELECT @ProdVer = CAST(SERVERPROPERTY('ProductVersion') AS VARCHAR);
+SET @MajorVer = CAST(PARSENAME(@ProdVer, 4) AS SMALLINT);
+
+IF @MajorVer >= 10	--SQL 2008 or higher
+	SET @Tsql = 'SELECT @Last = sqlserver_start_time FROM sys.dm_os_sys_info';
+ELSE	--SQL 2005 or less
+	SET @Tsql = 'SELECT @Last = DATEADD(ms, -ms_ticks, CURRENT_TIMESTAMP) FROM sys.dm_os_sys_info';
+
+EXEC sp_executesql @Tsql, N'@Last DATETIME OUTPUT', @Restart output;
+
+SELECT @Restart AS LastRestart;
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

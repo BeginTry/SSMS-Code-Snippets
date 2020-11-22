@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Database Sizes</Title>
+      <Shortcut></Shortcut>
+      <Description>Shows the size of each database on disk.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[--Database sizes on disk.
+SELECT db_name(f.database_id) AS database_name, SUM(f.size) / 128 / 1024.0 Size_GB
+FROM master.sys.master_files f
+WHERE db_name(f.database_id) NOT IN ('tempdb')
+GROUP BY db_name(f.database_id)
+UNION ALL
+SELECT 'tempdb', SUM(f.size) / 128 / 1024.0 Size_GB
+FROM tempdb.sys.database_files f
+GO]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

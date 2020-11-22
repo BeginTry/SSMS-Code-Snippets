@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Comment Header</Title>
+                        <Shortcut></Shortcut>
+			<Description>Inserts a comment header for a SQL Server object (stored proc, view, function, etc.)</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>ObjectSchema</ID>
+                    <ToolTip>Name of the object's schema</ToolTip>
+                    <Default>dbo</Default>
+                </Literal>
+                <Literal>
+                    <ID>ObjectName</ID>
+                    <ToolTip>Name of the object (stored proc, view, function, etc.)</ToolTip>
+                    <Default>ObjectName</Default>
+                </Literal>
+                <Literal>
+                    <ID>Today</ID>
+                    <ToolTip>Today's date</ToolTip>
+                    <Default>20XX-MM-DD</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[/******************************************************************************
+* Name     : $ObjectSchema$.$ObjectName$
+* Purpose  : 
+* Inputs   : 
+* Outputs  : 
+* Returns  : 
+******************************************************************************
+* Change History
+*	$Today$	DMason	Created.
+******************************************************************************/
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

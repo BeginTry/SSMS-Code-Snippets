@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Compatibility Level Not Optimal</Title>
+                        <Shortcut></Shortcut>
+			<Description>Query that generates ALTER DATABASE SET COMPATIBILITY_LEVEL commands for databases below the highest compatibility level supported by the instance.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+		</Header>
+		<Snippet>
+			<Code Language="SQL">
+				<![CDATA[SELECT d.name database_name, 
+	COALESCE(p.name, '<orphaned>') owner_name, 
+	compatibility_level,
+	PARSENAME( CAST(SERVERPROPERTY('ProductVersion') AS VARCHAR), 4) * 10 AS MajVer,
+		'ALTER DATABASE [' + d.name + '] SET COMPATIBILITY_LEVEL = ' +
+		CAST(PARSENAME( CAST(SERVERPROPERTY('ProductVersion') AS VARCHAR), 4) * 10 AS VARCHAR) + ';' + CHAR(13) + CHAR(10) AS Alter_Database_cmd
+FROM master.sys.databases d
+LEFT JOIN master.sys.server_principals p
+	ON p.sid = d.owner_sid
+WHERE d.compatibility_level <> PARSENAME( CAST(SERVERPROPERTY('ProductVersion') AS VARCHAR), 4) * 10;
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

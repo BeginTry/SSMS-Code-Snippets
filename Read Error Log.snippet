@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Read Error Log</Title>
+                        <Shortcut></Shortcut>
+			<Description>Reads the contents of a SQL error log (or SQL Agent error log).</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>LogNumber</ID>
+                    <ToolTip>The number of the log to be read. (0 for 1st log, 1 for 2nd log, etc.)</ToolTip>
+                    <Default>0</Default>
+                </Literal>
+                <Literal>
+                    <ID>LogType</ID>
+                    <ToolTip>The type of log to be read. (1 for SQL error logs, 2 for SQL Agent error logs.)</ToolTip>
+                    <Default>1</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[/*
+	https://sqlandme.com/2012/01/25/sql-server-reading-errorlog-with-xp_readerrorlog/
+*/
+
+--Read everything from an error log.
+CREATE TABLE #ErrLog (
+	ErrLogId INT IDENTITY PRIMARY KEY NONCLUSTERED,
+	LogDate DATETIME,
+	ProcessInfo VARCHAR(256),
+	[Text] VARCHAR(MAX)
+);
+
+DECLARE @LogNum INT = $LogNumber$;	--0 for 1st log, 1 for 2nd log, etc.
+DECLARE @LogType INT = $LogType$;	--1 for SQL error logs, 2 for SQL Agent error logs.
+
+INSERT INTO #ErrLog
+EXEC xp_readerrorlog @LogNum, @LogType;
+
+SELECT l.ErrLogId, CAST(l.LogDate AS DATE) AS LogDate, CAST(l.LogDate AS TIME) AS LogTime, l.ProcessInfo, l.[Text]
+FROM #ErrLog l
+ORDER BY l.ErrLogId
+
+--DROP TABLE #ErrLog
+
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

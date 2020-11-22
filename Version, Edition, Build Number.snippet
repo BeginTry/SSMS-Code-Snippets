@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Version, Edition, Build Number</Title>
+      <Shortcut></Shortcut>
+      <Description>Returns system and build information for the current installation of SQL Server.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[--Version, Edition, BuildNumber
+SELECT 
+	REPLACE(LEFT(LEFT(@@VERSION, CHARINDEX('(', @@VERSION) - 2), PATINDEX('% - %', @@VERSION)), 'Microsoft SQL Server ', '') Version,
+	REPLACE(LEFT(LEFT(@@VERSION, CHARINDEX('(', @@VERSION) - 2), PATINDEX('% - %', @@VERSION)), 'Microsoft SQL Server ', '') + --version
+		COALESCE(' - ' + CAST(SERVERPROPERTY('ProductLevel') AS VARCHAR(512)), '') +  --ProductLevel,
+		COALESCE(' - ' + CAST(SERVERPROPERTY('ProductUpdateLevel') AS VARCHAR(512)), '') --ProductUpdateLevel
+			AS FullVersion,
+	SERVERPROPERTY('ProductLevel') ProductLevel,
+	SERVERPROPERTY('ProductUpdateLevel') AS ProductUpdateLevel,
+	SERVERPROPERTY('Edition') Edition, 
+	SERVERPROPERTY('ProductUpdateReference') ProductUpdateReference,
+	SERVERPROPERTY('ProductVersion') BuildNumber
+GO]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

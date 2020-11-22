@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Columns As CSV List</Title>
+                        <Shortcut></Shortcut>
+			<Description>Prints a comma-separated list of column names for a table or view.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>SchemaName</ID>
+                    <ToolTip>Name of the object's schema</ToolTip>
+                    <Default>dbo</Default>
+                </Literal>
+                <Literal>
+                    <ID>ObjectName</ID>
+                    <ToolTip>Name of the object (table or view)</ToolTip>
+                    <Default>ObjectName</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[DECLARE @SchemaName SYSNAME = '$SchemaName$';
+DECLARE @TableName SYSNAME = '$ObjectName$';
+
+DECLARE @Cols VARCHAR(MAX) = '';
+
+SELECT @Cols = @Cols + c.Column_Name + ','
+FROM INFORMATION_SCHEMA.COLUMNS c
+WHERE c.TABLE_SCHEMA = @SchemaName
+AND c.Table_Name = @TableName
+ORDER BY Ordinal_Position
+
+IF @@ROWCOUNT > 0
+	PRINT LEFT(@Cols, LEN(@Cols) - 1);
+ELSE
+	PRINT 'Table or View not found.';
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

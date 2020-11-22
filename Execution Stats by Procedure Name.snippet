@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Execution Stats By Procedure Name</Title>
+                        <Shortcut></Shortcut>
+			<Description>Returns execution stats (with execution plans) for a specific stored procedure.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>ProcedureName</ID>
+                    <ToolTip>Name of a stored procedure.</ToolTip>
+                    <Default>ProcedureName</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[DECLARE @ProcName SYSNAME = '$ProcedureName$';
+
+SELECT 
+	DB_NAME(qp.dbid) [Database Name],
+	s.object_id,
+	OBJECT_NAME(s.object_id, s.database_id) ProcedureName, 
+	qp.query_plan,
+	--s.sql_handle,
+	--s.plan_handle,
+	s.last_execution_time,
+	s.last_elapsed_time / 1000 AS last_elapsed_time_ms,
+	s.last_worker_time / 1000 AS last_worker_time_ms,
+	s.last_logical_reads,
+	s.last_logical_writes,
+	s.execution_count ExecutionCount,
+	s.total_worker_time / 1000 TotalWorkerTime_ms,
+	s.total_logical_reads TotalLogicalReads,
+	s.total_logical_writes TotalLogicalWrites,
+	s.total_logical_reads / s.execution_count AvgLogicalReads,
+	s.total_logical_writes / s.execution_count AvgLogicalWrites,
+	s.total_elapsed_time / 1000 / s.execution_count Avg_elapsed_time_ms,
+	s.total_worker_time / 1000 / s.execution_count Avg_worker_time_ms
+FROM sys.dm_exec_procedure_stats s
+CROSS APPLY sys.dm_exec_query_plan(s.plan_handle) qp
+WHERE OBJECT_NAME(s.object_id, s.database_id) = @ProcName
+
+
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

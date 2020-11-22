@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>PAGE_VERIFY Database Option</Title>
+      <Shortcut></Shortcut>
+      <Description>Sets PAGE_VERIFY to CHECKSUM for any databases that don't already have the database option set.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[DECLARE @Tsql NVARCHAR(MAX) = '';
+
+SELECT @Tsql = @Tsql + 
+	'ALTER DATABASE [' + d.name + '] SET PAGE_VERIFY CHECKSUM WITH NO_WAIT;' + CHAR(13) + CHAR(10)
+FROM master.sys.databases d
+WHERE d.page_verify_option_desc <> 'CHECKSUM'
+AND d.replica_id IS NULL
+AND d.state_desc = 'ONLINE';
+
+SELECT @@ROWCOUNT;
+
+PRINT @Tsql;
+--EXEC(@Tsql);]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

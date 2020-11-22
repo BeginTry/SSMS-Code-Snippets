@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>DDL Trigger Events</Title>
+                        <Shortcut></Shortcut>
+			<Description>Query that returns a list of events available to DDL triggers.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+		</Header>
+		<Snippet>
+			<Code Language="SQL">
+				<![CDATA[SELECT 
+	CASE b.type_name 
+		WHEN 'DDL_SERVER_LEVEL_EVENTS' THEN 'Server Level'
+		WHEN 'DDL_DATABASE_LEVEL_EVENTS' THEN 'Database Level'
+	END AS Scope,
+	COALESCE(e.type, d.type, c.type, b.type, a.type) AS type,
+	COALESCE(e.type_name, d.type_name, c.type_name, b.type_name, a.type_name) AS type_name,
+	COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type, a.parent_type) AS parent_type,
+	p.type_name AS parent_type_name
+FROM sys.event_notification_event_types AS a
+LEFT JOIN sys.event_notification_event_types AS b ON a.type = b.parent_type
+LEFT JOIN sys.event_notification_event_types AS c ON b.type = c.parent_type
+LEFT JOIN sys.event_notification_event_types AS d ON c.type = d.parent_type
+LEFT JOIN sys.event_notification_event_types AS e ON d.type = e.parent_type
+LEFT JOIN sys.event_notification_event_types AS p 
+	ON p.type = COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type)
+WHERE a.parent_type IS NULL AND a.type = 10001
+ORDER BY 
+	b.type_name,
+	COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type, a.parent_type);
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

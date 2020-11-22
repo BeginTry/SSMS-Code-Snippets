@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>TRY ... CATCH</Title>
+      <Shortcut></Shortcut>
+      <Description>Control flow structure to implement error handling.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[DECLARE @ErrorMessage NVARCHAR(4000);
+DECLARE @ErrorSeverity INT;
+DECLARE @ErrorState INT;
+
+BEGIN TRY
+	--tsql
+END TRY
+BEGIN CATCH
+	SELECT 
+		@ErrorMessage = ERROR_MESSAGE(),
+		@ErrorSeverity = ERROR_SEVERITY(),
+		@ErrorState = ERROR_STATE();
+	RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+END CATCH]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
