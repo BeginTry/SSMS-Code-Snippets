@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>SQL Agent Job details by job_id</Title>
+                        <Shortcut></Shortcut>
+			<Description>Returns SQL Agent job and job step details for a specific job_id.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>job_id</ID>
+                    <ToolTip>Unique ID of the job.</ToolTip>
+                    <Default>0x6AC0F53DE7F66B4E933AD9E99EBF2DF1</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[SELECT j.name AS JobName, j.description AS JobDescription,
+	js.step_id, js.step_name, js.subsystem, js.command, js.database_name
+FROM msdb.dbo.sysjobs j
+JOIN msdb.dbo.sysjobsteps js
+	ON js.job_id = j.job_id
+WHERE j.job_id = $job_id$
+ORDER BY js.step_id
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
