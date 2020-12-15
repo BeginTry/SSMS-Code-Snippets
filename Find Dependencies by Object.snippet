@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Find Dependencies by Object</Title>
+      <Shortcut></Shortcut>
+      <Description>Generates a script that searches across all databases for SQL modules with a dependency on an object.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>ReferencedDatabase</ID>
+          <ToolTip>Name of the database where the object resides.</ToolTip>
+          <Default>ReferencedDatabase</Default>
+        </Literal>
+        <Literal>
+          <ID>ReferencedSchema</ID>
+          <ToolTip>Name of the schema that contains the object.</ToolTip>
+          <Default>ReferencedSchema</Default>
+        </Literal>
+        <Literal>
+          <ID>ReferencedObject</ID>
+          <ToolTip>Name of the object (stored proc, view, function, etc.)</ToolTip>
+          <Default>ReferencedObject</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="SQL">
+        <![CDATA[DECLARE @Tsql NVARCHAR(MAX) = '';
+
+SELECT @Tsql = @Tsql + 'SELECT 
+	''' + d.name + ''' AS referencing_database_name,
+	s.name COLLATE SQL_Latin1_General_CP1_CI_AS AS referencing_schema_name,
+	o.name COLLATE SQL_Latin1_General_CP1_CI_AS AS referencing_object_name
+FROM [' + d.name + '].sys.sql_expression_dependencies d
+JOIN [' + d.name + '].sys.objects o
+	ON o.object_id = d.referencing_id
+JOIN [' + d.name + '].sys.schemas s
+	ON s.schema_id = o.schema_id
+WHERE o.is_ms_shipped = 0
+AND d.referenced_database_name COLLATE SQL_Latin1_General_CP1_CI_AS IN (''$ReferencedDatabase$'', '''', NULL)
+AND d.referenced_schema_name COLLATE SQL_Latin1_General_CP1_CI_AS = ''$ReferencedSchema$''
+AND d.referenced_entity_name COLLATE SQL_Latin1_General_CP1_CI_AS = ''$ReferencedObject$''  UNION ALL ' + CHAR(13) + CHAR(10)
+FROM master.sys.databases d
+ORDER BY d.name
+
+SELECT @Tsql = LEFT (@Tsql, LEN(@Tsql) - LEN('UNION ALL ' + CHAR(13) + CHAR(10)))
+EXEC(@Tsql);
+GO]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
