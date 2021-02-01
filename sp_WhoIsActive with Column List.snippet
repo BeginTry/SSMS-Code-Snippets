@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sp_WhoIsActive with Column List</Title>
+      <Shortcut></Shortcut>
+      <Description>Execute sp_WhoIsActive, specifying the list of output columns for the result set.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[--http://whoisactive.com/docs/24_output/
+DECLARE @ColList VARCHAR(8000) = '[dd hh:mm:ss.mss][session_id][sql_text][login_name][wait_info][CPU]' +
+	'[tempdb_allocations][tempdb_current][blocking_session_id][reads][writes][physical_reads]' + 
+	'[used_memory][status][open_tran_count][percent_complete][host_name][database_name][program_name]' +
+	'[start_time][login_time][request_id][collection_time]';
+
+EXEC sp_WhoIsActive	@output_column_list = @ColList;
+GO]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
