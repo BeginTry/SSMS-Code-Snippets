@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sp_WhoIsActive ~ Blocking Chain</Title>
+      <Shortcut></Shortcut>
+      <Description>Shows chains of blocking/blocked SPIDS (if any) using sp_WhoIsActive.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[--http://whoisactive.com/docs/23_leader/
+DROP TABLE IF EXISTS #WhoIsActive;
+CREATE TABLE #WhoIsActive (
+	[dd hh:mm:ss.mss] VARCHAR(16),
+	[collection_time] DATETIME,
+	[session_id] INT,
+	blocking_session_id INT,
+	[sql_text] XML,
+	[query_plan] XML,
+	[login_name] SYSNAME,
+	wait_info VARCHAR(128),
+	[host_name] VARCHAR(255),
+	[database_name] SYSNAME,
+	[program_name] VARCHAR(255)
+);
+
+EXEC sp_WhoIsActive 
+	@get_plans = 1,
+	--Output column list must match @destination_table/#WhoIsActive.
+	@output_column_list = '[dd hh:mm:ss.mss][collection_time][session_id][blocking_session_id][sql_text][query_plan]
+	[login_name][wait_info][host_name][database_name][program_name]',
+	@find_block_leaders = 1,
+	@destination_table = '#WhoIsActive';
+
+SELECT [dd hh:mm:ss.mss], [collection_time], 
+	[session_id], [blocking_session_id], [sql_text], [query_plan],
+	[login_name], [wait_info], [host_name], [database_name], [program_name]
+FROM #WhoIsActive a
+WHERE a.blocking_session_id IS NOT NULL
+OR a.session_id IN (
+	SELECT b.blocking_session_id 
+	FROM #WhoIsActive b 
+	WHERE b.blocking_session_id IS NOT NULL
+);]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
