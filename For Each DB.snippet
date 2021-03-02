@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>For Each DB</Title>
+                        <Shortcut></Shortcut>
+			<Description>Executes the same query/command on all databases without cursors</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>Query</ID>
+                    <ToolTip>The query/command to run on each database.</ToolTip>
+                    <Default>Query</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[DECLARE @Cmd NVARCHAR(2000) 
+SELECT @Cmd = 'USE [?]; 
+
+$Query$
+';
+
+EXEC sp_MSforeachdb @Cmd; ]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
