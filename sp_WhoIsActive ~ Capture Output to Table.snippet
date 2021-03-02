@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sp_WhoIsActive ~ Capture Output to Table.</Title>
+      <Shortcut></Shortcut>
+      <Description>Execute sp_WhoIsActive, sending the output result set to a table.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[--http://whoisactive.com/docs/25_capturing/
+DROP TABLE IF EXISTS #WhoIsActive;
+CREATE TABLE #WhoIsActive (
+	[collection_time] DATETIME,
+	[session_id] INT,
+	[sql_text] XML,
+	[login_name] SYSNAME,
+	[host_name] VARCHAR(255),
+	[database_name] SYSNAME,
+	[program_name] VARCHAR(255)
+)
+EXEC sp_WhoIsActive 
+	@output_column_list = '[collection_time][session_id][sql_text][login_name][host_name][database_name][program_name]',
+	@destination_table = '#WhoIsActive'
+
+SELECT * FROM #WhoIsActive
+GO]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
