@@ -9,14 +9,21 @@
   </_locDefinition>
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>Version, Edition, Build Number</Title>
+      <Title>Server Properties</Title>
       <Shortcut></Shortcut>
       <Description>Returns system and build information for the current installation of SQL Server.</Description>
       <Author>Dave Mason @BeginTry</Author>
     </Header>
     <Snippet>
       <Code Language="SQL">
-        <![CDATA[--Version, Edition, BuildNumber
+        <![CDATA[DECLARE @RegistryValue VARCHAR(128);
+ 
+EXECUTE master.dbo.xp_instance_regread
+  @rootkey = N'HKEY_LOCAL_MACHINE',
+  @key = N'SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+  @value_name = N'ProductName',
+  @RegistryValue = @RegistryValue OUTPUT
+        
 SELECT 
 	REPLACE(LEFT(LEFT(@@VERSION, CHARINDEX('(', @@VERSION) - 2), PATINDEX('% - %', @@VERSION)), 'Microsoft SQL Server ', '') Version,
 	REPLACE(LEFT(LEFT(@@VERSION, CHARINDEX('(', @@VERSION) - 2), PATINDEX('% - %', @@VERSION)), 'Microsoft SQL Server ', '') + --version
@@ -27,7 +34,12 @@ SELECT
 	SERVERPROPERTY('ProductUpdateLevel') AS ProductUpdateLevel,
 	SERVERPROPERTY('Edition') Edition, 
 	SERVERPROPERTY('ProductUpdateReference') ProductUpdateReference,
-	SERVERPROPERTY('ProductVersion') BuildNumber
+	SERVERPROPERTY('ProductVersion') BuildNumber,
+	@RegistryValue AS [Windows OS Version],
+	SERVERPROPERTY('IsClustered') AS IsClustered,
+	SERVERPROPERTY(N'MachineName') AS VirtualServerName,
+	SERVERPROPERTY(N'ComputerNamePhysicalNetBIOS') AS CurrentHostName,
+	DEFAULT_DOMAIN() AS DefaultDomain
 GO]]>
       </Code>
     </Snippet>
