@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Database File Sizes</Title>
+      <Shortcut></Shortcut>
+      <Description>Shows the size, used space, and free space of each database file on disk.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[DROP TABLE IF EXISTS #DatabaseFiles;
+
+CREATE TABLE #DatabaseFiles (
+	database_name SYSNAME,
+	file_name SYSNAME,
+	type_desc SYSNAME,
+	SizeOnDisk_MB BIGINT,
+	SpaceUsed_MB BIGINT,
+	FreeSpace_MB BIGINT
+)
+
+DECLARE @Cmd NVARCHAR(2000) 
+SELECT @Cmd = 'USE [?]; 
+
+--Size, free space, used space per db
+;WITH t AS
+(
+	SELECT DB_NAME() database_name,
+		name file_name, f.type_desc, size * 8 / 1024 AS SizeOnDisk_MB,
+		FILEPROPERTY(name, ''SpaceUsed'') * 8 / 1024 AS SpaceUsed_MB
+	FROM sys.database_files f
+)
+INSERT INTO #DatabaseFiles
+SELECT *, t.SizeOnDisk_MB - t.SpaceUsed_MB AS FreeSpace_MB
+FROM t
+';
+
+EXEC sp_MSforeachdb @Cmd; 
+
+SELECT *
+FROM #DatabaseFiles df;
+GO]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
