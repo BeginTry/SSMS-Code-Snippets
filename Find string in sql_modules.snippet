@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Find string in sql_modules</Title>
+                        <Shortcut></Shortcut>
+			<Description>Returns a list of objects that contain a specific string within the object definition.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>SearchString</ID>
+                    <ToolTip>The string to search for within object definitions</ToolTip>
+                    <Default>SearchString</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[DECLARE @TSql NVARCHAR(MAX) = '';
+
+SELECT @TSql = @TSql + 
+	'SELECT ''' + d.name COLLATE SQL_Latin1_General_CP1_CI_AS + ''' AS database_name, ' +
+	'o.type_desc COLLATE SQL_Latin1_General_CP1_CI_AS AS object_type_desc, ' + 
+	'OBJECT_NAME(m.object_id, DB_ID(''' + d.name COLLATE SQL_Latin1_General_CP1_CI_AS + ''')) COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectName ' +
+	'FROM ' + QUOTENAME(d.name) COLLATE SQL_Latin1_General_CP1_CI_AS + '.sys.sql_modules m ' +
+	'JOIN ' + QUOTENAME(d.name) COLLATE SQL_Latin1_General_CP1_CI_AS + '.sys.objects o ' +
+	'ON o.object_id = m.object_id ' +
+	'WHERE m.definition COLLATE SQL_Latin1_General_CP1_CI_AS LIKE ''%$SearchString$%''' + 
+	CASE
+		WHEN LEAD(d.name) OVER (ORDER BY d.name) IS NULL THEN ';'
+		ELSE ' UNION ALL'
+	END +
+	CHAR(13) + CHAR(10)
+FROM master.sys.databases d
+WHERE d.database_id > 4
+ORDER BY d.name
+
+--PRINT @TSql;
+EXEC (@TSql);
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
