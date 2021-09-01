@@ -17,13 +17,23 @@
     <Snippet>
       <Code Language="SQL">
         <![CDATA[--Database sizes on disk.
-SELECT db_name(f.database_id) AS database_name, SUM(f.size) / 128 / 1024.0 Size_GB
-FROM master.sys.master_files f
-WHERE db_name(f.database_id) NOT IN ('tempdb')
-GROUP BY db_name(f.database_id)
+SELECT 
+	CASE WHEN d.name = 'tempdb' THEN 'tempdb (startup size)' ELSE d.name END AS database_name, 
+	ROUND(SUM(CAST(CASE WHEN f.type_desc = 'LOG' THEN f.size ELSE 0 END AS FLOAT) * 8 / 1024 / 1024), 4) AS [Log Size (GB)],
+	ROUND(SUM(CAST(CASE WHEN f.type_desc = 'LOG' THEN 0 ELSE f.size END AS FLOAT) * 8 / 1024 / 1024), 4) AS [Data Size (GB)],
+	ROUND(SUM(CAST(f.size AS FLOAT) * 8 / 1024 / 1024), 4) AS [Total Size (GB)]
+FROM master.sys.databases d
+JOIN master.sys.master_files f
+	ON f.database_id = d.database_id
+GROUP BY d.name
 UNION ALL
-SELECT 'tempdb', SUM(f.size) / 128 / 1024.0 Size_GB
+SELECT
+	'tempdb (current size)' AS database_name, 
+	ROUND(SUM(CAST(CASE WHEN f.type_desc = 'LOG' THEN f.size ELSE 0 END AS FLOAT) * 8 / 1024 / 1024), 4) AS [Log Size (GB)],
+	ROUND(SUM(CAST(CASE WHEN f.type_desc = 'LOG' THEN 0 ELSE f.size END AS FLOAT) * 8 / 1024 / 1024), 4) AS [Data Size (GB)],
+	ROUND(SUM(CAST(f.size AS FLOAT) * 8 / 1024 / 1024), 4) AS [Total Size (GB)]
 FROM tempdb.sys.database_files f
+ORDER BY database_name
 GO]]>
       </Code>
     </Snippet>
