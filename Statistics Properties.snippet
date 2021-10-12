@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Statistics Properties</Title>
+                        <Shortcut></Shortcut>
+			<Description>Returns properties of statistics for a specified database table or indexed view.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>DBName</ID>
+                    <ToolTip>Database Name</ToolTip>
+                    <Default>master</Default>
+                </Literal>
+                <Literal>
+                    <ID>ObjectSchema</ID>
+                    <ToolTip>Name of the object's schema</ToolTip>
+                    <Default>dbo</Default>
+                </Literal>
+                <Literal>
+                    <ID>ObjectName</ID>
+                    <ToolTip>Name of the object (table or indexed view)</ToolTip>
+                    <Default>ObjectName</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[USE $DBName$;
+
+DECLARE @Schema SYSNAME = '$ObjectSchema$';
+DECLARE @Table SYSNAME = '$ObjectName$';
+
+SELECT 
+	sch.name AS SchemaName,
+	so.name AS TableName, 
+	ss.name AS StatsName, 
+	CAST(sp.last_updated AS SMALLDATETIME) AS last_updated, 
+	sp.rows, 
+	sp.rows_sampled, 
+	sp.steps, 
+	sp.unfiltered_rows, 
+	sp.modification_counter,
+	TRY_CAST(sp.modification_counter * 100.0 / sp.rows AS NUMERIC(7,2)) AS PctModified,
+	'UPDATE STATISTICS [' + sch.name + '].[' + so.name + '] [' + ss.name + '] WITH FULLSCAN; '
+FROM sys.stats ss
+JOIN sys.objects so 
+	ON ss.object_id = so.object_id
+JOIN sys.schemas sch 
+	ON so.schema_id = sch.schema_id
+CROSS APPLY sys.dm_db_stats_properties(so.object_id,ss.stats_id) sp
+WHERE so.is_ms_shipped = 0
+AND sch.name = @Schema
+AND so.name = @Table
+ORDER BY sp.modification_counter DESC
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
