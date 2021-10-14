@@ -29,6 +29,7 @@
 		<![CDATA[DECLARE @Tsql NVARCHAR(MAX) = '';
 
 SELECT @Tsql = @Tsql + 'SELECT ''' + d.name + ''' AS DBName, 
+	SCHEMA_NAME(o.schema_id) COLLATE SQL_Latin1_General_CP1_CI_AS AS SchemaName, 
 	o.name COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectName, 
   o.type_desc COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectType
 FROM [' + d.name + '].sys.objects o 
