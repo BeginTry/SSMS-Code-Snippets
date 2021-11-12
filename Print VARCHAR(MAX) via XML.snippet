@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Print VARCHAR(MAX) via XML</Title>
+      <Shortcut></Shortcut>
+      <Description>Returns a long data string as XML. Click the returned value in the SSMS grid, 
+      which will open a new tab and display the string with formatting/whitespace intact.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>Variable</ID>
+          <ToolTip>Any variable containing a long query string or other data.</ToolTip>
+          <Default>@TSql</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="SQL">
+        <![CDATA[SELECT [Long_Data_String] = $Variable$ FOR XML PATH(''),TYPE
+]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
