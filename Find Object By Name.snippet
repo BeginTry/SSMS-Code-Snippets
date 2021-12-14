@@ -35,6 +35,7 @@ SELECT @Tsql = @Tsql + 'SELECT ''' + d.name + ''' AS DBName,
 FROM [' + d.name + '].sys.objects o 
 WHERE o.name COLLATE SQL_Latin1_General_CP1_CI_AS = ''$ObjectName$''  UNION ALL ' + CHAR(13) + CHAR(10)
 FROM master.sys.databases d
+WHERE d.state_desc = 'ONLINE'
 ORDER BY d.name
 
 SELECT @Tsql = LEFT (@Tsql, LEN(@Tsql) - LEN('UNION ALL ' + CHAR(13) + CHAR(10)))
