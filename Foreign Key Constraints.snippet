@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+  </_locDefinition>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Foreign Key Constraints</Title>
+      <Shortcut></Shortcut>
+      <Description>Returns information on Foreign Key Constraints, including commands to DROP and CREATE them.</Description>
+      <Author>Dave Mason @BeginTry</Author>
+    </Header>
+    <Snippet>
+      <Code Language="SQL">
+        <![CDATA[--Foreign Key constraints (in the current database context).
+SELECT 
+	C.CONSTRAINT_NAME [constraint_name], 
+	C.TABLE_SCHEMA [FK_table_schema], C.TABLE_NAME [FK_table_name], KCU.COLUMN_NAME [FK_column_name], 
+	C2.TABLE_SCHEMA [PK_table_schema], C2.TABLE_NAME [PK_table_name], KCU2.COLUMN_NAME [PK_column_name],
+	RC.DELETE_RULE on_delete_action,RC.UPDATE_RULE on_update_action,
+	'ALTER TABLE [' + C.TABLE_SCHEMA + '].[' + C.TABLE_NAME + '] DROP CONSTRAINT [' + C.CONSTRAINT_NAME + '];' AS Drop_Constraint_Cmd,
+	'ALTER TABLE [' + C.TABLE_SCHEMA + '].[' + C.TABLE_NAME + '] WITH CHECK ADD CONSTRAINT [' + C.CONSTRAINT_NAME + '] FOREIGN KEY([' + KCU.COLUMN_NAME + '])
+	REFERENCES [' + C2.TABLE_SCHEMA + '].[' + C2.TABLE_NAME + '] ([' + KCU2.COLUMN_NAME + ']);' AS Add_Constraint_Cmd
+FROM   INFORMATION_SCHEMA.TABLE_CONSTRAINTS C 
+JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU 
+    ON C.CONSTRAINT_SCHEMA = KCU.CONSTRAINT_SCHEMA 
+    AND C.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME 
+JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC 
+    ON C.CONSTRAINT_SCHEMA = RC.CONSTRAINT_SCHEMA 
+    AND C.CONSTRAINT_NAME = RC.CONSTRAINT_NAME 
+JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS C2 
+    ON RC.UNIQUE_CONSTRAINT_SCHEMA = C2.CONSTRAINT_SCHEMA 
+    AND RC.UNIQUE_CONSTRAINT_NAME = C2.CONSTRAINT_NAME 
+JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU2 
+    ON C2.CONSTRAINT_SCHEMA = KCU2.CONSTRAINT_SCHEMA 
+    AND C2.CONSTRAINT_NAME = KCU2.CONSTRAINT_NAME 
+    AND KCU.ORDINAL_POSITION = KCU2.ORDINAL_POSITION 
+WHERE  C.CONSTRAINT_TYPE = 'FOREIGN KEY'
+ORDER BY C2.TABLE_NAME]]>
+      </Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
