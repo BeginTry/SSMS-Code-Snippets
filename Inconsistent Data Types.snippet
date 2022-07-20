@@ -42,11 +42,18 @@ WHERE t.TABLE_TYPE = 'BASE TABLE'
 )
 SELECT 
 	SUM(COLUMN_COUNT) AS TABLE_COUNT, ct.COLUMN_NAME, 
-		(
-			SELECT 'COLUMN: ' + QUOTENAME(ct.COLUMN_NAME) + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) +
-				STRING_AGG(ct.Tables, CHAR(13) + CHAR(10))
-			FOR XML PATH(''),TYPE
-		) AS Tables
+
+	--This column could be suitable for copy/paste to Excel.
+	--(In Excel, ensure "Wrap Text" is enabled. Choosing a fixed-width 
+	--font for the column will also be helpful.)
+	'=' + STRING_AGG('"' + REPLACE(ct.Tables, CHAR(13) + CHAR(10), '" & CHAR(10) & "') + '"', ' & CHAR(10) & ') AS Tables_Excel,
+
+	--Output as XML for easy viewing from the SSMS results grid.
+	(
+		SELECT 'COLUMN: ' + QUOTENAME(ct.COLUMN_NAME) + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) +
+			STRING_AGG(ct.Tables, CHAR(13) + CHAR(10))
+		FOR XML PATH(''),TYPE
+	) AS Tables_XML
 FROM ColumnTypes ct
 GROUP BY ct.COLUMN_NAME
 HAVING COUNT(*) > 1;
