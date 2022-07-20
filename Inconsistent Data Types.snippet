@@ -32,7 +32,10 @@ WHERE t.TABLE_TYPE = 'BASE TABLE'
 		AND t.TABLE_NAME = c.TABLE_NAME
 	CROSS APPLY (
 		SELECT CASE 
-			WHEN c.DATA_TYPE = 'decimal' THEN 'numeric' 
+			--For simplicity, consider these types as "numeric" for comparison purposes.
+			--This will prevent the script from identifying a money data type as being 
+			--a mismatch with a numeric(19,4) data type.
+			WHEN c.DATA_TYPE IN ('decimal', 'money', 'smallmoney') THEN 'numeric' 
 			ELSE c.DATA_TYPE END
 			AS DATA_TYPE
 	) AS ca
