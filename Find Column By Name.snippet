@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Find Column By Name</Title>
+                        <Shortcut></Shortcut>
+			<Description>Generates a script that searches for a SQL Server column (within a table or view) by name across all databases.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+                <Literal>
+                    <ID>ColumnName</ID>
+                    <ToolTip>Name of the Column (within a table or view)</ToolTip>
+                    <Default>ColumnName</Default>
+                </Literal>
+			</Declarations>
+			<Code Language="SQL">
+		<![CDATA[DECLARE @Tsql NVARCHAR(MAX) = '';
+
+SELECT @Tsql = @Tsql + 'SELECT c.TABLE_CATALOG	COLLATE SQL_Latin1_General_CP1_CI_AS AS TABLE_CATALOG,
+	c.TABLE_SCHEMA	COLLATE SQL_Latin1_General_CP1_CI_AS AS TABLE_SCHEMA,
+	c.TABLE_NAME	COLLATE SQL_Latin1_General_CP1_CI_AS AS TABLE_NAME,
+	c.COLUMN_NAME	COLLATE SQL_Latin1_General_CP1_CI_AS AS COLUMN_NAME,
+	c.ORDINAL_POSITION,
+	c.COLUMN_DEFAULT	COLLATE SQL_Latin1_General_CP1_CI_AS AS COLUMN_DEFAULT,
+	c.IS_NULLABLE	COLLATE SQL_Latin1_General_CP1_CI_AS AS IS_NULLABLE,
+	c.DATA_TYPE	COLLATE SQL_Latin1_General_CP1_CI_AS AS DATA_TYPE,
+	c.CHARACTER_MAXIMUM_LENGTH,
+	c.CHARACTER_OCTET_LENGTH,
+	c.NUMERIC_PRECISION,
+	c.NUMERIC_PRECISION_RADIX,
+	c.NUMERIC_SCALE,
+	c.DATETIME_PRECISION
+FROM [' + d.name + '].INFORMATION_SCHEMA.COLUMNS c
+WHERE c.COLUMN_NAME COLLATE SQL_Latin1_General_CP1_CI_AS = ''$ColumnName$''  UNION ALL ' + CHAR(13) + CHAR(10)
+FROM master.sys.databases d
+WHERE d.state_desc = 'ONLINE'
+ORDER BY d.name
+
+SELECT @Tsql = LEFT (@Tsql, LEN(@Tsql) - LEN('UNION ALL ' + CHAR(13) + CHAR(10)))
+EXEC(@Tsql);
+GO]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
