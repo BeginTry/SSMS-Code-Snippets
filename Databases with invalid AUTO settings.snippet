@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<_locDefinition xmlns="urn:locstudio">
+		<_locDefault _loc="locNone" />
+		<_locTag _loc="locData">Title</_locTag>
+		<_locTag _loc="locData">Description</_locTag>
+		<_locTag _loc="locData">Author</_locTag>
+		<_locTag _loc="locData">ToolTip</_locTag>
+	</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Databases with invalid AUTO settings</Title>
+			<Shortcut></Shortcut>
+			<Description>Shows databases with invalid settings for Auto-Shrink, Auto-Close, Auto-Create-Statistics, or Auto-Update-Stats.</Description>
+			<Author>Dave Mason @BeginTry</Author>
+		</Header>
+		<Snippet>
+			<Code Language="SQL">
+				<![CDATA[--Databases with invalid setting for auto shrink.
+SELECT name AS DatabaseName, 'is_auto_shrink_on' AS DatabaseSetting, is_auto_shrink_on AS SettingValue,
+	'ALTER DATABASE [' + d.name + '] SET AUTO_SHRINK OFF WITH NO_WAIT;' AS AlterDatabaseCmd
+FROM master.sys.databases d
+WHERE state <> 6	--OFFLINE
+AND is_auto_shrink_on = 1
+
+UNION
+
+--Databases with invalid setting for auto close.
+SELECT name AS DatabaseName, 'is_auto_close_on' AS DatabaseSetting, is_auto_close_on AS SettingValue,
+	'ALTER DATABASE [' + d.name + '] SET AUTO_CLOSE OFF WITH NO_WAIT;' AS AlterDatabaseCmd
+FROM master.sys.databases d
+WHERE state <> 6	--OFFLINE
+AND is_auto_close_on = 1
+
+UNION
+
+--Databases with invalid setting for auto create stats.
+SELECT name AS DatabaseName, 'is_auto_create_stats_on' AS DatabaseSetting, is_auto_create_stats_on AS SettingValue,
+	'ALTER DATABASE [' + d.name + '] SET AUTO_CREATE_STATISTICS ON;' AS AlterDatabaseCmd
+FROM master.sys.databases d
+WHERE state <> 6	--OFFLINE
+AND is_auto_create_stats_on <> 1
+
+UNION
+
+--Databases with invalid setting for auto update stats.
+SELECT name AS DatabaseName, 'is_auto_update_stats_on' AS DatabaseSetting, is_auto_update_stats_on AS SettingValue, 
+	'ALTER DATABASE [' + d.name + '] SET AUTO_UPDATE_STATISTICS ON WITH NO_WAIT;' AS AlterDatabaseCmd
+FROM master.sys.databases d
+WHERE state <> 6	--OFFLINE
+AND is_auto_update_stats_on <> 1
+ORDER BY name
+GO]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
