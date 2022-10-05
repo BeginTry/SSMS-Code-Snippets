@@ -11,19 +11,37 @@
 		<Header>
 			<Title>Change Physical File Names</Title>
                         <Shortcut></Shortcut>
-			<Description>Query that generates ALTER DATABASE MODIFY FILE commands.</Description>
+			<Description>Query that generates TSQL/DOS commands for 'changing' database OS file names.</Description>
 			<Author>Dave Mason @BeginTry</Author>
 		</Header>
 		<Snippet>
 			<Code Language="SQL">
-				<![CDATA[SELECT DB_NAME(database_id), 
-	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET OFFLINE;' Offline_cmd,
-	f.physical_name AS OldName,
+				<![CDATA[--Specify DATA, LOG paths.
+DECLARE @NewDataPath VARCHAR(MAX) = CAST(SERVERPROPERTY('InstanceDefaultDataPath') AS VARCHAR(MAX));
+DECLARE @NewLogPath VARCHAR(MAX) = CAST(SERVERPROPERTY('InstanceDefaultLogPath') AS VARCHAR(MAX));
+
+IF RIGHT(@NewDataPath, 1) <> '\'
+	SET @NewDataPath = @NewDataPath + '\';
+IF RIGHT(@NewLogPath, 1) <> '\'
+	SET @NewLogPath = @NewLogPath + '\';
+
+SELECT DB_NAME(database_id) AS DatabaseName, 
+	f.physical_name AS OldFilename,
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;' + CHAR(13) + CHAR(10) +
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET OFFLINE;' SingleUser_Offline_cmd,
 	'ALTER DATABASE [' + DB_NAME(database_id) + ']
-MODIFY FILE (NAME = ''' + f.name + ''', FILENAME = ''' + f.physical_name + ''');' AS Modify_File_cmd,
-	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET ONLINE;' Online_cmd
+MODIFY FILE (NAME = ''' + f.name + ''', FILENAME = ''' + nm.NewFilename + ''');' AS Modify_File_cmd,
+	'ECHO f | XCOPY "' + f.physical_name + '" "' + nm.NewFilename + '"' AS DOS_Xcopy_Cmd,
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET MULTI_USER;' + CHAR(13) + CHAR(10) +
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET ONLINE;' MultiUser_Online_cmd,
+	'DEL "' + f.physical_name + '"' DOS_Del_Cmd
 FROM master.sys.master_files f
-ORDER BY DB_NAME(database_id)
+CROSS APPLY ( 
+	SELECT 
+	CASE WHEN f.type_desc = 'LOG' THEN @NewLogPath ELSE @NewDataPath END + 
+	REVERSE(LEFT(REVERSE(f.physical_name), CHARINDEX('\', REVERSE(f.physical_name)) - 1))
+	AS NewFilename ) AS nm
+ORDER BY f.type, DB_NAME(database_id);
 ]]>
 			</Code>
 		</Snippet>
