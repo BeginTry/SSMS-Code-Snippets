@@ -34,7 +34,7 @@ FROM msdb.dbo.sysjobs j
 JOIN msdb.dbo.sysjobsteps js
 	ON js.job_id = j.job_id
 WHERE j.job_id = $job_id$
-ORDER BY js.step_id
+ORDER BY j.name, js.step_id
 ]]>
 			</Code>
 		</Snippet>
