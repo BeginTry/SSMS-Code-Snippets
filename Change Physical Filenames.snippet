@@ -27,13 +27,13 @@ IF RIGHT(@NewLogPath, 1) <> '\'
 
 SELECT DB_NAME(database_id) AS DatabaseName, 
 	f.physical_name AS OldFilename,
+	'ALTER DATABASE [' + DB_NAME(database_id) + ']' + CHAR(13) + CHAR(10) +
+		'MODIFY FILE (NAME = ''' + f.name + ''', FILENAME = ''' + nm.NewFilename + ''');' AS Modify_File_cmd,
 	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;' + CHAR(13) + CHAR(10) +
-	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET OFFLINE;' SingleUser_Offline_cmd,
-	'ALTER DATABASE [' + DB_NAME(database_id) + ']
-MODIFY FILE (NAME = ''' + f.name + ''', FILENAME = ''' + nm.NewFilename + ''');' AS Modify_File_cmd,
+		'ALTER DATABASE [' + DB_NAME(database_id) + '] SET MULTI_USER;' + CHAR(13) + CHAR(10) +
+		'ALTER DATABASE [' + DB_NAME(database_id) + '] SET OFFLINE;' Offline_cmd,
 	'ECHO f | XCOPY "' + f.physical_name + '" "' + nm.NewFilename + '"' AS DOS_Xcopy_Cmd,
-	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET MULTI_USER;' + CHAR(13) + CHAR(10) +
-	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET ONLINE;' MultiUser_Online_cmd,
+	'ALTER DATABASE [' + DB_NAME(database_id) + '] SET ONLINE;' Online_cmd,
 	'DEL "' + f.physical_name + '"' DOS_Del_Cmd
 FROM master.sys.master_files f
 CROSS APPLY ( 
