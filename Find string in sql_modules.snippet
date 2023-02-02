@@ -31,7 +31,7 @@
 SELECT @TSql = @TSql + 
 	'SELECT ''' + d.name COLLATE SQL_Latin1_General_CP1_CI_AS + ''' AS database_name, ' +
 	'o.type_desc COLLATE SQL_Latin1_General_CP1_CI_AS AS object_type_desc, ' + 
-	'OBJECT_NAME(m.object_id, DB_ID(''' + d.name COLLATE SQL_Latin1_General_CP1_CI_AS + ''')) COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectName ' +
+	'OBJECT_NAME(m.object_id, DB_ID(''' + d.name COLLATE SQL_Latin1_General_CP1_CI_AS + ''')) COLLATE SQL_Latin1_General_CP1_CI_AS AS ObjectName, ' +
   '(SELECT m.definition FOR XML PATH(''''),TYPE).value(''.'',''NVARCHAR(MAX)'') AS [Command as XML] ' +
 	'FROM ' + QUOTENAME(d.name) COLLATE SQL_Latin1_General_CP1_CI_AS + '.sys.sql_modules m ' +
 	'JOIN ' + QUOTENAME(d.name) COLLATE SQL_Latin1_General_CP1_CI_AS + '.sys.objects o ' +
