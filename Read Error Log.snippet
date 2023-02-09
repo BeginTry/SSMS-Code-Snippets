@@ -34,8 +34,8 @@
 		<![CDATA[/*
 	https://sqlandme.com/2012/01/25/sql-server-reading-errorlog-with-xp_readerrorlog/
 */
-
 --Read everything from an error log.
+IF OBJECT_ID('tempdb..#ErrLog') IS NOT NULL DROP TABLE #ErrLog;
 CREATE TABLE #ErrLog (
 	ErrLogId INT IDENTITY PRIMARY KEY NONCLUSTERED,
 	LogDate DATETIME,
@@ -52,9 +52,6 @@ EXEC xp_readerrorlog @LogNum, @LogType;
 SELECT l.ErrLogId, CAST(l.LogDate AS DATE) AS LogDate, CAST(l.LogDate AS TIME) AS LogTime, l.ProcessInfo, l.[Text]
 FROM #ErrLog l
 ORDER BY l.ErrLogId
-
---DROP TABLE #ErrLog
-
 ]]>
 			</Code>
 		</Snippet>
