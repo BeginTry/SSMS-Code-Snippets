@@ -21,9 +21,9 @@
 		WHEN 'DDL_SERVER_LEVEL_EVENTS' THEN 'Server Level'
 		WHEN 'DDL_DATABASE_LEVEL_EVENTS' THEN 'Database Level'
 	END AS Scope,
-	COALESCE(e.type, d.type, c.type, b.type, a.type) AS type,
-	COALESCE(e.type_name, d.type_name, c.type_name, b.type_name, a.type_name) AS type_name,
-	COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type, a.parent_type) AS parent_type,
+	t.type,
+	t.type_name,
+	t.parent_type,
 	p.type_name AS parent_type_name
 FROM sys.event_notification_event_types AS a
 LEFT JOIN sys.event_notification_event_types AS b ON a.type = b.parent_type
@@ -32,10 +32,14 @@ LEFT JOIN sys.event_notification_event_types AS d ON c.type = d.parent_type
 LEFT JOIN sys.event_notification_event_types AS e ON d.type = e.parent_type
 LEFT JOIN sys.event_notification_event_types AS p 
 	ON p.type = COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type)
+CROSS APPLY (
+	SELECT	
+		COALESCE(e.type, d.type, c.type, b.type, a.type) AS type,
+		COALESCE(e.type_name, d.type_name, c.type_name, b.type_name, a.type_name) AS type_name,
+		COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type, a.parent_type) AS parent_type
+) AS t
 WHERE a.parent_type IS NULL AND a.type = 10001
-ORDER BY 
-	b.type_name,
-	COALESCE(e.parent_type, d.parent_type, c.parent_type, b.parent_type, a.parent_type);
+ORDER BY b.type_name, t.parent_type;
 ]]>
 			</Code>
 		</Snippet>
