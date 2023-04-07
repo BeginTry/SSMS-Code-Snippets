@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+</_locDefinition>
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>Instance Default Paths</Title>
+                        <Shortcut></Shortcut>
+			<Description>Returns the default data path and default log path.</Description>
+			<Author>Dave Mason https://mastodon.social/@DaveMasonDotMe </Author>
+		</Header>
+		<Snippet>
+			<Code Language="SQL">
+				<![CDATA[--Applies to: SQL Server 2012 (11.x) through current version
+SELECT 
+	CAST(SERVERPROPERTY('InstanceDefaultDataPath') AS VARCHAR(MAX)) AS InstanceDefaultDataPath,
+	CAST(SERVERPROPERTY('InstanceDefaultLogPath') AS VARCHAR(MAX)) AS InstanceDefaultLogPath;
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
