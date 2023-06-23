@@ -28,8 +28,12 @@
 			<Code Language="SQL">
 		<![CDATA[SELECT j.name AS JobName, j.description AS JobDescription,
   js.step_id, js.step_name, js.subsystem, 
-	(SELECT CHAR(13) + CHAR(10) + js.command + CHAR(13) + CHAR(10) FOR XML PATH(''),TYPE).value('.','NVARCHAR(MAX)') AS [Command as XML], 
-	js.database_name
+	(SELECT CHAR(13) + CHAR(10) + js.command + CHAR(13) + CHAR(10) FOR XML PATH(''),TYPE) AS [Command as XML], 
+	js.database_name,
+	'SQLAgent - TSQL JobStep (Job ' + 
+	--Cast the job_id (UNIQUEIDENTIFIER) as VARBINARY first, then convert to VARCHAR.
+	CONVERT(VARCHAR(64), CAST(j.job_id AS VARBINARY(100)), 1) + 
+	' : Step ' + CAST(js.step_id AS VARCHAR(MAX)) + ')' AS ["Program Name" (as it appears in DMVs, spWhoIsActive, etc.)]
 FROM msdb.dbo.sysjobs j
 JOIN msdb.dbo.sysjobsteps js
 	ON js.job_id = j.job_id
